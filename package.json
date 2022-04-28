@@ -1,0 +1,38 @@
+{
+  "name": "insta-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec babel-node server.js",
+    "migrate": "npx prisma migrate dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkp0131/insta-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mkp0131/insta-2/issues"
+  },
+  "homepage": "https://github.com/mkp0131/insta-2#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "@graphql-tools/load-files": "^6.5.3",
+    "@graphql-tools/merge": "^8.2.10",
+    "@graphql-tools/schema": "^8.3.10",
+    "@prisma/client": "^3.13.0",
+    "apollo-server": "^2.25.2",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
+    "prisma": "^3.13.0"
+  }
+}

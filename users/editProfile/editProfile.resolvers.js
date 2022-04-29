@@ -1,6 +1,7 @@
 import client from '../../client';
 import bcrypt from 'bcrypt';
 import { protectedResolver } from '../uesrs.utils';
+import fs from 'fs';
 
 const resolverFn = async (
   _,
@@ -8,11 +9,16 @@ const resolverFn = async (
   { loggedInUser }
 ) => {
   try {
-    if (!loggedInUser) {
-      return {
-        ok: false,
-        error: '회원정보가 없습니다',
-      };
+    let avatarUrl = null;
+    if (avatar) {
+      const { filename, createReadStream } = await avatar;
+      const newFilename = loggedInUser.id + '-' + Date.now() + '-' + filename;
+      const readStream = createReadStream();
+      const writeStream = fs.createWriteStream(
+        process.cwd() + '/uploads/' + newFilename
+      );
+      readStream.pipe(writeStream);
+      avatarUrl = `http://localhost:4000/static/${newFilename}`;
     }
 
     let newPassword = null;
@@ -27,7 +33,7 @@ const resolverFn = async (
         userName,
         ...(newPassword && { password: newPassword }),
         bio,
-        avatar,
+        ...(avatarUrl && { avatar: avatarUrl }),
       },
     });
     if (ok) {

@@ -31,7 +31,14 @@ export default {
             password: hashPassword,
           },
         });
-        return user;
+        if (user) {
+          return { ok: true };
+        } else {
+          return {
+            ok: false,
+            error: '회원가입이 실패하였습니다',
+          };
+        }
       } catch (error) {
         return error;
       }

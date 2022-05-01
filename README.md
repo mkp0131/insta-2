@@ -8,6 +8,7 @@
 - findUnique는 OR 가 되지 않는다.
 - count: null 이 아닌 row만 카운트(속도빠름)
 - find류의 조건에 where 뿐만 아니라 select 도 할 수 있다.
+- promise 를 바로 리턴할경우 graphQL 이 알아서 처리해준다.
 
 ## JWT (jsonwebtoken)
 
@@ -249,4 +250,63 @@ const following = await client.user
     skip: lastId ? 1 : 0,
     ...(lastId && { cursor: { id: lastId } }),
   });
+```
+
+### Computed Fields
+
+- "데이터베이스에는 존재하지 않지만", "GraphQL schema에는 존재하는" 필드들
+- 매번 Request를 받을 때마다 새롭게 계산되서 보여준다
+- 해당 데이터베이스를 조회할때 같이 사용되는 db에 저장이 안되어있고, 계산해야만 하는 값들을 넣어주면 편하게 사용가능
+- Query, Mutation 이외의 타입에도 resolver 를 사용 할 수 있다.
+- resolver 함수에는 parent, args, context, and info의 네 가지 인수가 전달
+- parent 는 field 의 parent 를 반환 (필드가 속해있는 그룹)
+- parent가 없는 최상위 field resolver(예: Query field)의 경우 이 값은 Apollo Server의 생성자에 전달된 rootValue 함수
+
+```js
+// DB마이그레이션 하는것이 아닌 gql 에만 정의
+import { gql } from 'apollo-server';
+
+export default gql`
+  type User {
+    id: Int!
+    firstName: String!
+    lastName: String
+    userName: String!
+    email: String!
+    createdAt: String!
+    updatedAt: String!
+    bio: String
+    avatar: String
+    followers: [User]
+    following: [User]
+    totalFollowers: Int! #Computed Fields
+    totalFollowing: Int! #Computed Fields
+    isMe: Boolean! #Computed Fields
+    isFollowing: Boolean! #Computed Fields
+  }
+`;
+```
+
+- GraphQL 에 타입들은 모두 resolvers 를 설정 할 수있다.
+
+```js
+import client from '../client';
+
+export default {
+  User: {
+    totalFollowers: ({ id }, _, { loggedInUser }) =>
+      client.user.count({ where: { following: { some: { id } } } }),
+    totalFollowing: ({ id }, _, { loggedInUser }) =>
+      client.user.count({ where: { followers: { some: { id } } } }),
+    isMe: ({ id }, _, { loggedInUser }) => loggedInUser.id === id,
+    isFollowing: async ({ id }, _, { loggedInUser }) => {
+      if (!loggedInUser) return false;
+
+      const check = await client.user.count({
+        where: { id: loggedInUser.id, following: { some: { id } } },
+      });
+      return Boolean(check);
+    },
+  },
+};
 ```

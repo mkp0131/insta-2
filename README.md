@@ -310,3 +310,24 @@ export default {
   },
 };
 ```
+
+# 2022년 5월 2일 해야할 것들
+
+photo 모델
+id
+user
+userid
+file
+caption
+hashtags
+createdAt
+updatedAt
+
+Hashtag 모델
+id
+hashtag
+photos
+createdAt
+updatedAt
+
+connectOrCreate: 해당하는 자료가 없다면 새로운 자료를 생성(if문과 같음!)
